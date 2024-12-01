@@ -1,0 +1,37 @@
+const express = require('express');
+const mongoose = require('mongoose');
+const bodyParser = require('body-parser');
+const cors = require('cors');
+
+const Post = require('./models/Post');
+
+const app = express();
+const port = 3000;
+
+// Connect to MongoDB
+mongoose.connect('mongodb://localhost/blog', { useNewUrlParser: true, useUnifiedTopology: true })
+  .then(() => console.log('MongoDB Connected'))
+  .catch(err => console.error(err));
+
+// Middleware
+app.use(cors());
+app.use(bodyParser.json());
+
+// Routes
+app.get('/posts', async (req, res) => {
+  const posts = await Post.find();
+  res.json(posts);
+});
+
+app.post('/posts', async (req, res) => {
+  const { title, content, category } = req.body;
+  const post = new Post({ title, content, category });
+  await post.save();
+  res.json(post);
+});
+
+// ... (routes for updating and deleting posts)
+
+app.listen(port, () => {
+  console.log(Server listening on port ${port});
+});
